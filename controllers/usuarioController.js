@@ -10,6 +10,7 @@ const formularioLogin = (req, res) => {
     csrfToken: req.csrfToken(),
   });
 };
+
 const auntenticar = async (req, res) => {
   // Validacion
   await check("email").isEmail().withMessage("Eso no parece un email").run(req);
@@ -33,18 +34,18 @@ const auntenticar = async (req, res) => {
   //comprobar si el usuario exite
   const { email, password, id } = req.body;
   //Verificar que el usuario no este diplicado
-  const exiteUsurio = await Usuario.findOne({
+  const exiteUsuario = await Usuario.findOne({
     where: { email },
   });
 
-  if (!exiteUsurio) {
+  if (!exiteUsuario) {
     return res.render("auth/login", {
       pagina: "Iniciar Sesión",
       csrfToken: req.csrfToken(),
       errores: [{ msg: "El usuario no Exite" }],
     });
   }
-  if (!exiteUsurio.confirm) {
+  if (!exiteUsuario.confirm) {
     return res.render("auth/login", {
       pagina: "Iniciar Sesión",
       csrfToken: req.csrfToken(),
@@ -53,7 +54,7 @@ const auntenticar = async (req, res) => {
   }
 
   //validar Password
-  const validPassword = bcrypt.compareSync(password, exiteUsurio.password);
+  const validPassword = bcrypt.compareSync(password, exiteUsuario.password);
 
   if (!validPassword) {
     return res.render("auth/login", {
@@ -62,13 +63,12 @@ const auntenticar = async (req, res) => {
       errores: [{ msg: "El password es invalido" }],
     });
   }
-  const token = generarJWT(exiteUsurio.id);
+  const token = generarJWT(exiteUsuario.id);
   console.log(token);
 
   //craer una cookie
 
-  return res
-    .cookie("_token", token, {
+  return res.cookie("_token", token, {
       httpOnly: true,
       //secure:true
     })

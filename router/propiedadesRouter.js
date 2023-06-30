@@ -1,12 +1,15 @@
 import express from "express";
 import { body } from "express-validator";
 import { admin, crear, guardar } from "../controllers/propiedadesController.js";
+import { protegerRutas } from "../middleware/protegerRutas.js";
+
 const router = express.Router();
 
-router.get("/mis-propiedades", admin);
-router.get("/propiedades/crear", crear);
+router.get("/mis-propiedades", protegerRutas, admin);
+router.get("/propiedades/crear", protegerRutas, crear);
 router.post(
   "/propiedades/crear",
+  protegerRutas,
   body("titulo")
     .notEmpty()
     .withMessage("Por favor anexar un Titulo al anuncio"),

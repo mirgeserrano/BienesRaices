@@ -3,7 +3,7 @@ import db from "../config/db.js";
 import bcrypt from "bcrypt";
 
 const Usuario = db.define(
-  "usurios",
+  "usuarios",
   {
     nombre: {
       type: DataTypes.STRING,
@@ -25,6 +25,14 @@ const Usuario = db.define(
       beforeCreate: async function (usuario) {
         const salt = await bcrypt.genSalt(10);
         usuario.password = await bcrypt.hash(usuario.password, salt);
+      },
+      //funcion personalizada para anexar o eliminar datos
+    },
+    scopes: {
+      eliminarPassword: {
+        attributes: {
+          exclude: ["password", "token", "confirm", "createdAt", "updatedAt"],
+        },
       },
     },
   }
