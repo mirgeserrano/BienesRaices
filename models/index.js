@@ -6,6 +6,6 @@ import Categoria from "./Categoria.js";
 //Precio.hasOne(Propiedad);
 Propiedad.belongsTo(Precio);
 Propiedad.belongsTo(Categoria);
-Propiedad.belongsTo(Usuario);
+Propiedad.belongsTo(Usuario, { foreignKey: "categoriaId" });
 
 export { Precio, Propiedad, Usuario, Categoria };
