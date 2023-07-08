@@ -33,7 +33,7 @@ const auntenticar = async (req, res) => {
 
   //comprobar si el usuario exite
   const { email, password, id } = req.body;
-  //Verificar que el usuario no este diplicado
+  //Verificar que el usuario no este duplicado
   const exiteUsuario = await Usuario.findOne({
     where: { email },
   });
@@ -64,11 +64,11 @@ const auntenticar = async (req, res) => {
     });
   }
   const token = generarJWT(exiteUsuario.id);
-  console.log(token);
 
   //craer una cookie
 
-  return res.cookie("_token", token, {
+  return res
+    .cookie("_token", token, {
       httpOnly: true,
       //secure:true
     })
@@ -238,7 +238,6 @@ const resetPassword = async (req, res) => {
     pagina: "Restablecer tu password",
     mensaje: "Hemos enviado un email con las instrucciones",
   });
-  console.log(usuario);
 };
 
 const comprobarToken = async (req, res) => {
