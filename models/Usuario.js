@@ -26,7 +26,7 @@ const Usuario = db.define(
         const salt = await bcrypt.genSalt(10);
         usuario.password = await bcrypt.hash(usuario.password, salt);
       },
-      //funcion personalizada para anexar o eliminar datos
+      //funcion personalizada para anexar o eliminar datos de un modelo en expecifico
     },
     scopes: {
       eliminarPassword: {
@@ -39,5 +39,8 @@ const Usuario = db.define(
 );
 
 //Metodo que verifica un passaword
+Usuario.prototype.verificarPassword = function (password) {
+  return bcrypt.compareSync(password, this.password);
+};
 
 export default Usuario;

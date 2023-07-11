@@ -1,10 +1,32 @@
+//import { unLink } from "node:fs/promises ";
 import { validationResult } from "express-validator";
 import { Categoria, Precio, Propiedad } from "../models/index.js";
 
-const admin = (req, res) => {
+const admin = async (req, res) => {
+  const { id } = req.usuario;
+  // aplicando where a Sequelize para buscar el id del usuario
+  const propiedades = await Propiedad.findAll({
+    where: {
+      usuarioId: id,
+    },
+    // asi se incluye las uniones de tablas en zequeale
+    include: [
+      {
+        model: Categoria,
+        as: "categoria",
+        //  required: true,
+      },
+      {
+        model: Precio,
+        as: "precio",
+      },
+    ],
+  });
+
   res.render("propiedades/admin", {
     pagina: "Mis propiedades",
-    barra: true,
+    propiedades,
+    csrfToken: req.csrfToken(),
   });
 };
 
@@ -17,7 +39,6 @@ const crear = async (req, res) => {
   ]);
   res.render("propiedades/crear", {
     pagina: "Crear propiedades",
-    barra: true,
     csrfToken: req.csrfToken(),
     categorias,
     precios,
@@ -36,7 +57,6 @@ const guardar = async (req, res) => {
     ]);
     res.render("propiedades/crear", {
       pagina: "Crear propiedades",
-      barra: true,
       csrfToken: req.csrfToken(),
       categorias,
       precios,
@@ -57,9 +77,11 @@ const guardar = async (req, res) => {
     precio: precioId,
     categoria: categoriaId,
   } = req.body;
+
   const { id: usuarioId } = req.usuario;
 
   try {
+    //insertando la propiedad a la base de datos
     const propiedadGuardar = await Propiedad.create({
       titulo,
       descripcion,
@@ -74,8 +96,9 @@ const guardar = async (req, res) => {
       usuarioId,
       imagen: "",
     });
-    //console.log(propiedadGuardar);
+
     const { id } = propiedadGuardar;
+
     res.redirect(`/propiedades/agregar-imagen/${id}`);
   } catch (error) {
     console.log(error);
@@ -139,4 +162,125 @@ const agregarImagen = async (req, res) => {
     propiedad,
   });
 };
-export { admin, crear, guardar, agregarImagen, almacenarImagen };
+
+const editar = async (req, res) => {
+  const { id } = req.params;
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  // Validar que la propiedad pertenece a quien visita esta página
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  const [categorias, precios] = await Promise.all([
+    Categoria.findAll(),
+    Precio.findAll(),
+  ]);
+  res.render("propiedades/editar", {
+    pagina: "Editar propiedades",
+    csrfToken: req.csrfToken(),
+    categorias,
+    precios,
+    // Editar, pasamos el objeto lleno para leer las propiedades
+    datos: propiedad,
+  });
+};
+
+const guardarCambios = async (req, res) => {
+  //verificar la validacion del formulario
+  let resultado = validationResult(req);
+
+  if (!resultado.isEmpty()) {
+    const [categorias, precios] = await Promise.all([
+      Categoria.findAll(),
+      Precio.findAll(),
+    ]);
+
+    return res.render("propiedades/editar", {
+      pagina: "Editar propiedades",
+      csrfToken: req.csrfToken(),
+      categorias,
+      precios,
+      errores: resultado.array(),
+      //este el ultimo req
+      datos: req.body,
+    });
+  }
+
+  const { id } = req.params;
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  // Validar que la propiedad pertenece a quien visita esta página
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect("/mis-propiedades");
+  }
+  //Reescribir el obeto y guardar
+  try {
+    const {
+      titulo,
+      descripcion,
+      habitaciones,
+      estacionamiento,
+      wc,
+      calle,
+      lat: lng,
+      logintud,
+      precio: precioId,
+      categoria: categoriaId,
+    } = req.body;
+    propiedad.set({
+      titulo,
+      descripcion,
+      habitaciones,
+      estacionamiento,
+      wc,
+      calle,
+      lng,
+      logintud,
+      precioId,
+      categoriaId,
+    });
+    await propiedad.save();
+    res.redirect("/mis-propiedades");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const eliminar = async (req, res) => {
+  const { id } = req.params;
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  // Validar que la propiedad pertenece a quien visita esta página
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect("/mis-propiedades");
+  }
+  //Eliminar la imagen
+  //await unLink(`public/uploads/${propiedad.imagen}`);
+  //eliminar la propiedad
+  await propiedad.destroy();
+  res.redirect("/mis-propiedades");
+};
+
+export {
+  admin,
+  crear,
+  guardar,
+  agregarImagen,
+  almacenarImagen,
+  editar,
+  guardarCambios,
+  eliminar,
+};

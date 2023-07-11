@@ -1,3 +1,4 @@
-
+//- forma de mostrar de ver si llega la informacionde la base de datos a la vista
+-pre= JSON.stringify(propiedades, undefined, 2)
     
-    script(src="/js/mapa.js")
+    
