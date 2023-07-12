@@ -1,4 +1,5 @@
-//import { unLink } from "node:fs/promises ";
+//import { unlink } from "node:fs/promises ";
+import fs from "fs";
 import { validationResult } from "express-validator";
 import { Categoria, Precio, Propiedad } from "../models/index.js";
 
@@ -104,6 +105,33 @@ const guardar = async (req, res) => {
     console.log(error);
   }
 };
+
+const agregarImagen = async (req, res) => {
+  const { id } = req.params;
+
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id);
+  if (!propiedad) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  // Validar que la propiedad no este publicada
+  if (propiedad.publicado) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  // Validar que la propiedad pertenece a quien visita esta página
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  res.render("propiedades/agregar-imagen", {
+    pagina: `Agregar Imagen: ${propiedad.titulo}`,
+    csrfToken: req.csrfToken(),
+    propiedad,
+  });
+};
+
 const almacenarImagen = async (req, res, next) => {
   const { id } = req.params;
 
@@ -129,38 +157,11 @@ const almacenarImagen = async (req, res, next) => {
     // Almacenar la imagen y publicar propiedad
     propiedad.imagen = req.file.filename;
     propiedad.publicado = 1;
-
     await propiedad.save();
-
     next();
   } catch (error) {
     console.log(error);
   }
-};
-const agregarImagen = async (req, res) => {
-  const { id } = req.params;
-
-  // Validar que la propiedad exista
-  const propiedad = await Propiedad.findByPk(id);
-  if (!propiedad) {
-    return res.redirect("/mis-propiedades");
-  }
-
-  // Validar que la propiedad no este publicada
-  if (propiedad.publicado) {
-    return res.redirect("/mis-propiedades");
-  }
-
-  // Validar que la propiedad pertenece a quien visita esta página
-  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
-    return res.redirect("/mis-propiedades");
-  }
-
-  res.render("propiedades/agregar-imagen", {
-    pagina: `Agregar Imagen: ${propiedad.titulo}`,
-    csrfToken: req.csrfToken(),
-    propiedad,
-  });
 };
 
 const editar = async (req, res) => {
@@ -255,10 +256,12 @@ const guardarCambios = async (req, res) => {
   }
 };
 
-const eliminar = async (req, res) => {
+const eliminar = async (req, res, next) => {
   const { id } = req.params;
-  // Validar que la propiedad exista
+  // Validar que la propiedad
+
   const propiedad = await Propiedad.findByPk(id);
+
   if (!propiedad) {
     return res.redirect("/mis-propiedades");
   }
@@ -268,12 +271,26 @@ const eliminar = async (req, res) => {
     return res.redirect("/mis-propiedades");
   }
   //Eliminar la imagen
-  //await unLink(`public/uploads/${propiedad.imagen}`);
+
+  const rutaImagen = `public/uploads/${propiedad.imagen}`; // Ruta completa de la imagen a eliminar
+
+  fs.unlink(rutaImagen, (error) => {
+    if (error) {
+      console.error("Error al eliminar la imagen:", error);
+    } else {
+      console.log("Imagen eliminada correctamente");
+      next();
+    }
+  });
+
   //eliminar la propiedad
   await propiedad.destroy();
   res.redirect("/mis-propiedades");
 };
 
+//Aerea publica
+
+const mostrarPropiedad = async () => {};
 export {
   admin,
   crear,
@@ -283,4 +300,5 @@ export {
   editar,
   guardarCambios,
   eliminar,
+  mostrarPropiedad,
 };

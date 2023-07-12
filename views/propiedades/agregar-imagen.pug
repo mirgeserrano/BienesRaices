@@ -11,8 +11,9 @@ block content
        
     div(class="bg-white shadow py-8 px-4 rounded mx-auto max-w-4xl my-10 md:px-10")
         form.space-y-8( id='imagen' class="dropzone border-dashed border-2 w-full min:h-96 h-auto rounded flex-col justify-center items-center" method="POST" action=`/propiedades/agregar-imagen/${propiedad.id }`)
-            input(type="hidden" name="_csrf" value=csrfToken)
+            input(type="hidden" name="_csrf" value= csrfToken)
             
-        button(class="my-5 w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-none text-white font-bold uppercase cursor-pointer" type="button" id="publicar" ) Publicar Imagen    
+        button(id="publicar" class="my-5 w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-none text-white font-bold uppercase cursor-pointer" type="button" ) Publicar Imagen
+        
 block scripts   
    script(src="/js/agregarImagen.js")
