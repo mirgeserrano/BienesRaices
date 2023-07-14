@@ -2,33 +2,64 @@
 import fs from "fs";
 import { validationResult } from "express-validator";
 import { Categoria, Precio, Propiedad } from "../models/index.js";
+import { log } from "console";
 
 const admin = async (req, res) => {
-  const { id } = req.usuario;
-  // aplicando where a Sequelize para buscar el id del usuario
-  const propiedades = await Propiedad.findAll({
-    where: {
-      usuarioId: id,
-    },
-    // asi se incluye las uniones de tablas en zequeale
-    include: [
-      {
-        model: Categoria,
-        as: "categoria",
-        //  required: true,
-      },
-      {
-        model: Precio,
-        as: "precio",
-      },
-    ],
-  });
+  //LEER EL QUERY  para realizar la paginacion
+  const { pagina: paginaActual } = req.query;
+  const expresion = /^[1-9][0-9]*$/;
+  if (!expresion.test(paginaActual)) {
+    return res.redirect("/mis-propiedades?pagina=1");
+  }
+  try {
+    const { id } = req.usuario;
+    //limite y Offset para el paginador
+    const limit = 5;
+    const offset = paginaActual * limit - limit;
 
-  res.render("propiedades/admin", {
-    pagina: "Mis propiedades",
-    propiedades,
-    csrfToken: req.csrfToken(),
-  });
+    // aplicando where a Sequelize para buscar el id del usuario
+    const [propiedades, total] = await Promise.all([
+      Propiedad.findAll({
+        limit,
+        offset,
+        where: {
+          usuarioId: id,
+        },
+        // asi se incluye las uniones de tablas en zequeale
+        include: [
+          {
+            model: Categoria,
+            as: "categoria",
+            //  required: true,
+          },
+          {
+            model: Precio,
+            as: "precio",
+          },
+        ],
+      }),
+      Propiedad.count({
+        where: {
+          usuarioId: id,
+        },
+      }),
+    ]);
+
+    res.render("propiedades/admin", {
+      pagina: "Mis propiedades",
+      propiedades,
+      csrfToken: req.csrfToken(),
+      //la propiedad ceil ayuda a redondear un numero eje: 2/5
+      paginas: Math.ceil(total / limit),
+      //con la propiedad number se combierte en numero
+      paginaActual: Number(paginaActual),
+      total,
+      offset,
+      limit,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 //Fromulario oara crear una nueva propiedad
@@ -290,7 +321,33 @@ const eliminar = async (req, res, next) => {
 
 //Aerea publica
 
-const mostrarPropiedad = async () => {};
+const mostrarPropiedad = async (req, res) => {
+  const { id } = req.params;
+  // Validar que la propiedad
+
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      {
+        model: Categoria,
+        as: "categoria",
+        //  required: true,
+      },
+      {
+        model: Precio,
+        as: "precio",
+      },
+    ],
+  });
+
+  if (!propiedad) {
+    return res.redirect("/404");
+  }
+
+  res.render("propiedades/mostrar", {
+    pagina: ` ${propiedad.titulo}`,
+    propiedad,
+  });
+};
 export {
   admin,
   crear,

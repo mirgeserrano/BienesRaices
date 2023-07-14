@@ -83,5 +83,6 @@ router.post(
 router.post("/propiedades/eliminar/:id", protegerRutas, eliminar);
 
 //rutas publicas
-router.get("propiedad/:id", mostrarPropiedad);
+router.get("/propiedad/:id", mostrarPropiedad);
+
 export default router;
