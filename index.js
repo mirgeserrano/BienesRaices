@@ -3,6 +3,8 @@ import csrf from "csurf";
 import cookieParser from "cookie-parser";
 import usuarioRouter from "./router/usuarioRouter.js";
 import propiedadesRouter from "./router/propiedadesRouter.js";
+import appRouter from "./router/appRouter.js";
+import apiRouter from "./router/apiRouter.js";
 import db from "./config/db.js";
 
 //creo la app
@@ -35,8 +37,10 @@ app.use(express.static("public"));
 
 //Routing
 //use busca todas la que usa /
+app.use("/", appRouter);
 app.use("/auth", usuarioRouter);
 app.use("/", propiedadesRouter);
+app.use("/api", apiRouter);
 
 // Definir el puerto
 const port = process.env.PORT || 4000;

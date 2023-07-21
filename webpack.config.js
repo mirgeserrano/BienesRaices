@@ -6,6 +6,7 @@ export default {
     mapa: "./src/js/mapa.js",
     agregarImagen: "./src/js/agregarImagen.js",
     mostrarMapa: "./src/js/mostrarMapa.js",
+    mostrarInicio: "./src/js/mostrarInicio.js",
   },
   output: {
     //
@@ -13,4 +14,6 @@ export default {
     //ubicacion
     path: path.resolve("public/js"),
   },
+
+  devtool: "eval-cheap-source-map",
 };
