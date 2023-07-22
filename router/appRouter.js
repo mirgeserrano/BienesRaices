@@ -10,7 +10,7 @@ const router = express.Router();
 //Pagina de inicio
 router.get("/", inicio);
 //categorias
-router.get("/categoria", categoria);
+router.get("/categoria/:id", categoria);
 //pagina 404
 router.get("/404", noEncontrado);
 //Buscador

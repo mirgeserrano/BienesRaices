@@ -1,16 +1,19 @@
 
 header.bg-indigo-500.p-4 
-  .container.mx-auto.flex.justify-between.items-center 
-        h1.text-2x1.text-white.font-extrabold.text-center Bienes 
-            span.font-normal Raices  
+  .container.mx-auto.flex.justify-between.items-center
+        a(href="/")
+            h1.text-2x1.text-white.font-extrabold.text-center Bienes 
+                span.font-normal Raices  
         Nav(class='my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white hidden')
            a(href="/auth/registrar") Crear Cuenta 
            a(href="/auth/login") Iniciar Sesión
 
 dic(class="bg-indigo-900 py-4 hidden md:block lg:block")
     div(class="container mx-auto flex justify-between")
+     
         a(href="/categoria/1" class="text-sm font-bold uppercase text-white") Casas
         a(href="/categoria/2" class="text-sm font-bold uppercase text-white") Departamentos
         a(href="/categoria/3" class="text-sm font-bold uppercase text-white") Hoteles
         a(href="/categoria/4" class="text-sm font-bold uppercase text-white") Locales
-        a(href="/categoria/4" class="text-sm font-bold uppercase text-white") Terrenos
+        a(href="/categoria/5" class="text-sm font-bold uppercase text-white") Terrenos
+
