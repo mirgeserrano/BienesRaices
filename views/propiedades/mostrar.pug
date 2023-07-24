@@ -12,7 +12,7 @@ block  content
             a(href="#" class="font-bold text-gray-600 text-sm") Categorias:   
                 span(class="font-normal")= propiedad.categoria.nombre 
 
-        div(class="mt-5 md:flex md:gap-4")
+        div(class="mt-5 md:flex md:gap-4 md:items-start")
             div(class="md:w-2/3 bg-fuchsia-50 shadow rounded-lg") 
                 img(src=`/uploads/${propiedad.imagen}`, alt=`imagen de la propiedad ${propiedad.titulo}`) 
                 
@@ -30,7 +30,7 @@ block  content
                             span(class="text-gray-800 block text-lg")= propiedad.estacionamiento 
                         p(class="text-gray-600 font-bold text-xs") Precio
                             span(class="text-gray-800 block text-lg")= propiedad.precio.nombre
-            div(class="md:w-1/3")
+            div(class="md:w-1/3  bg-fuchsia-50 shadow rounded-lg")
                 h3(class="text-center py-10 leading-6 text-2xl font-bold text-gray-900") Ubicacion 
 
                 div(class="h-96" id="mapa")
@@ -39,7 +39,16 @@ block  content
 
                 div(class="p-5")
                     p(class="text-gray-600 font-bold text-xs") Direccion 
-                        span( id="calle" class="text-gray-800 block text-xl")= propiedad.calle 
+                        span( id="calle" class="text-gray-800 block text-xl")= propiedad.calle
+                    if !esVendedor 
+                    h3(class="text-2xl text-center my-10 font-extrabold text-gray-800") Vendedor
+                    if !usuario
+                        p puedes enviar el mesaje
+                        
+                    else
+                        div(class="flex flex-col justify-center gap-2")
+                            p Si Deseas Contactar 
+                            a(class="text-indigo-600" href="/auth/registrar") Debes de Crear una Cuenta 
 
 block scripts   
     script(src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js")

@@ -2,7 +2,7 @@
 import fs from "fs";
 import { validationResult } from "express-validator";
 import { Categoria, Precio, Propiedad } from "../models/index.js";
-import { log } from "console";
+import { esVendedor } from "../helpers/index.js";
 
 const admin = async (req, res) => {
   //LEER EL QUERY  para realizar la paginacion
@@ -323,6 +323,7 @@ const eliminar = async (req, res, next) => {
 
 const mostrarPropiedad = async (req, res) => {
   const { id } = req.params;
+  console.log(req.usuario);
   // Validar que la propiedad
 
   const propiedad = await Propiedad.findByPk(id, {
@@ -346,6 +347,9 @@ const mostrarPropiedad = async (req, res) => {
   res.render("propiedades/mostrar", {
     pagina: ` ${propiedad.titulo}`,
     propiedad,
+    csrfToken: req.csrfToken(),
+    usuario: req.usuario,
+    esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
   });
 };
 export {
