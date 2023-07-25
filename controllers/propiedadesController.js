@@ -1,7 +1,7 @@
 //import { unlink } from "node:fs/promises ";
 import fs from "fs";
 import { validationResult } from "express-validator";
-import { Categoria, Precio, Propiedad } from "../models/index.js";
+import { Categoria, Precio, Propiedad, Mensaje } from "../models/index.js";
 import { esVendedor } from "../helpers/index.js";
 
 const admin = async (req, res) => {
@@ -352,6 +352,64 @@ const mostrarPropiedad = async (req, res) => {
     esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
   });
 };
+
+const enviarMensaje = async (req, res) => {
+  const { id } = req.params;
+  // Validar que la propiedad
+
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      {
+        model: Categoria,
+        as: "categoria",
+        //  required: true,
+      },
+      {
+        model: Precio,
+        as: "precio",
+      },
+    ],
+  });
+
+  if (!propiedad) {
+    return res.redirect("/404");
+  }
+
+  //Validacion
+  let resultado = validationResult(req);
+
+  if (!resultado.isEmpty()) {
+    res.render("propiedades/mostrar", {
+      //    pagina: ` ${propiedad.titulo}`,
+      propiedad,
+      csrfToken: req.csrfToken(),
+      usuario: req.usuario,
+      esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+      errores: resultado.array(),
+    });
+  }
+  //Alacenar
+
+  const { mensaje } = req.body;
+  const { id: propiedadId } = req.params;
+  const { id: usuarioId } = req.usuario;
+
+  await Mensaje.create({
+    mensaje,
+    propiedadId,
+    usuarioId,
+  });
+
+  res.redirect("/");
+  // res.render("propiedades/mostrar", {
+  //   pagina: ` ${propiedad.titulo}`,
+  //   propiedad,
+  //   csrfToken: req.csrfToken(),
+  //   usuario: req.usuario,
+  //   esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+  //  //enviado: true,
+  // });
+};
 export {
   admin,
   crear,
@@ -362,4 +420,5 @@ export {
   guardarCambios,
   eliminar,
   mostrarPropiedad,
+  enviarMensaje,
 };
