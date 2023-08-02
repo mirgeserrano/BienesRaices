@@ -8,9 +8,11 @@ import {
   almacenarImagen,
   editar,
   guardarCambios,
+  cambiarEstado,
   eliminar,
   mostrarPropiedad,
   enviarMensaje,
+  verMensaje,
 } from "../controllers/propiedadesController.js";
 import { protegerRutas } from "../middleware/protegerRutas.js";
 import { identificarUsuario } from "../middleware/identificarUsuario.js";
@@ -78,12 +80,13 @@ router.post(
     .isNumeric()
     .withMessage("olvidaste seleccionar la cantidad de Estacionamiento"),
   body("wc").isNumeric().withMessage("olvidaste seleciona los baños"),
-  body("lat").notEmpty().withMessage("Ubica la propiedad en el mapa"),
+  body("logintud").notEmpty().withMessage("Ubica la propiedad en el mapa"),
   guardarCambios
 );
 
 router.post("/propiedades/eliminar/:id", protegerRutas, eliminar);
 
+router.put("propiedades/:id", protegerRutas, cambiarEstado);
 //rutas publicas
 router.get("/propiedad/:id", identificarUsuario, mostrarPropiedad);
 
@@ -92,7 +95,9 @@ router.post(
   identificarUsuario,
   body("mensaje")
     .isLength({ min: 20 })
-    .withMessage("El mensaje no puede estar vacio"),
+    .withMessage("El mensaje no puede estar vacio o es muy corto"),
   enviarMensaje
 );
+
+router.get("/mensajes/:id", protegerRutas, verMensaje);
 export default router;

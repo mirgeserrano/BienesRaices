@@ -75,7 +75,9 @@ const auntenticar = async (req, res) => {
     })
     .redirect("/mis-propiedades");
 };
-
+const cerrarSesion = (req, res) => {
+  return res.clearCookie("_token").status(200).redirect("/auth/login");
+};
 const formularioRes = (req, res) => {
   res.render("auth/registrar", {
     pagina: "Crear cuenta",
@@ -302,6 +304,7 @@ const nuevoPassword = async (req, res) => {
 export {
   auntenticar,
   confirmar,
+  cerrarSesion,
   formularioLogin,
   formularioOlvidePassword,
   formularioRes,

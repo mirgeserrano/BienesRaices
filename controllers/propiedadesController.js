@@ -1,8 +1,14 @@
 //import { unlink } from "node:fs/promises ";
 import fs from "fs";
 import { validationResult } from "express-validator";
-import { Categoria, Precio, Propiedad, Mensaje } from "../models/index.js";
-import { esVendedor } from "../helpers/index.js";
+import {
+  Categoria,
+  Precio,
+  Propiedad,
+  Mensaje,
+  Usuario,
+} from "../models/index.js";
+import { esVendedor, formatearFecha } from "../helpers/index.js";
 
 const admin = async (req, res) => {
   //LEER EL QUERY  para realizar la paginacion
@@ -35,6 +41,10 @@ const admin = async (req, res) => {
           {
             model: Precio,
             as: "precio",
+          },
+          {
+            model: Mensaje,
+            as: "mensajes",
           },
         ],
       }),
@@ -232,7 +242,7 @@ const guardarCambios = async (req, res) => {
       Precio.findAll(),
     ]);
 
-    return res.render("propiedades/editar", {
+    res.render("propiedades/editar", {
       pagina: "Editar propiedades",
       csrfToken: req.csrfToken(),
       categorias,
@@ -254,6 +264,7 @@ const guardarCambios = async (req, res) => {
   if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
     return res.redirect("/mis-propiedades");
   }
+
   //Reescribir el obeto y guardar
   try {
     const {
@@ -285,6 +296,9 @@ const guardarCambios = async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+};
+const cambiarEstado = (req, res) => {
+  res.send('cargandooo')
 };
 
 const eliminar = async (req, res, next) => {
@@ -355,6 +369,7 @@ const mostrarPropiedad = async (req, res) => {
 
 const enviarMensaje = async (req, res) => {
   const { id } = req.params;
+  console.log(id);
   // Validar que la propiedad
 
   const propiedad = await Propiedad.findByPk(id, {
@@ -379,8 +394,7 @@ const enviarMensaje = async (req, res) => {
   let resultado = validationResult(req);
 
   if (!resultado.isEmpty()) {
-    res.render("propiedades/mostrar", {
-      //    pagina: ` ${propiedad.titulo}`,
+    return res.render("propiedades/mostrar", {
       propiedad,
       csrfToken: req.csrfToken(),
       usuario: req.usuario,
@@ -402,14 +416,46 @@ const enviarMensaje = async (req, res) => {
 
   res.redirect("/");
   // res.render("propiedades/mostrar", {
-  //   pagina: ` ${propiedad.titulo}`,
   //   propiedad,
   //   csrfToken: req.csrfToken(),
   //   usuario: req.usuario,
   //   esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
-  //  //enviado: true,
+  //   enviado: true,
   // });
 };
+
+//leer mensajes
+const verMensaje = async (req, res) => {
+  const { id } = req.params;
+  // Validar que la propiedad
+
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      {
+        model: Mensaje,
+        as: "mensajes",
+        include: [{ model: Usuario.scope("eliminarPassword"), as: "usuario" }],
+      },
+    ],
+  });
+
+  if (!propiedad) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  // Validar que la propiedad pertenece a quien visita esta página
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect("/mis-propiedades");
+  }
+
+  res.render("propiedades/mensajes", {
+    pagina: "Mensaje",
+    csrfToken: req.csrfToken(),
+    mensajes: propiedad.mensajes,
+    formatearFecha,
+  });
+};
+
 export {
   admin,
   crear,
@@ -418,7 +464,9 @@ export {
   almacenarImagen,
   editar,
   guardarCambios,
+  cambiarEstado,
   eliminar,
   mostrarPropiedad,
   enviarMensaje,
+  verMensaje,
 };

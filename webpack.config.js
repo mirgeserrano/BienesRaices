@@ -7,6 +7,7 @@ export default {
     agregarImagen: "./src/js/agregarImagen.js",
     mostrarMapa: "./src/js/mostrarMapa.js",
     mostrarInicio: "./src/js/mostrarInicio.js",
+    cambiarEstado: "./src/js/cambiarEstado.js",
   },
   output: {
     //
