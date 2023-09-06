@@ -1,9 +1,14 @@
-## Proyect Bienes Raices🔧
+# Proyect Bienes Raices🔧
 Realizado con 📋
-* NodeJS
-* Pug
-* Tailwind Css
-* Mysql
+- NodeJS
+- Pug
+- Tailwind Css
+- Mysql
+
+# Clona este repositorio:
+
+   ```shell
+   git clone https://github.com/mirgeserrano/BienesRaices
 
 # Installation
 commad to install the project
