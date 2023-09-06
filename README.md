@@ -8,7 +8,7 @@ Realizado con 🔧
 # Clone is repositore:
    git clone
 
-(https://github.com/mirgeserrano/BienesRaices)
+https://github.com/mirgeserrano/BienesRaices
 
 ## Installation
 commad to install the project
