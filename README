@@ -1,12 +1,12 @@
-#Proyect Bienes Raices🔧
+# Proyect Bienes Raices🔧
 
 Realizado con 📋
-*NodeJS
-*Pug
-*Tailwind Css
-*Mysql
+* NodeJS
+* Pug
+* Tailwind Css
+* Mysql
 
-#Installation
+# Installation
 commad to install the project
 ...
 npm install
