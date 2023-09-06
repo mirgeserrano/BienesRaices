@@ -1,15 +1,15 @@
-#Proyect de Bienes Raices🔧
+# Proyect de Bienes Raices🔧
 
 Realizado con 📋
-*NodeJS
-*Pug
-*Tailwind Css
-*Mysql
+* NodeJS
+* Pug
+* Tailwind Css
+* Mysql
 
-#Installation
+# Installation
 commad to install the project
 ...
-npm install
+ npm install
 ...
 
 Make sure to create a file
@@ -26,17 +26,17 @@ EMAIL_PASS=
 BACKEND_URL=
 
 
-#Compiles and hot-reloads for development
+# Compiles and hot-reloads for development
 ...
 npm run dev
 ...
 
-#Compiles and minifies for production
+# Compiles and minifies for production
 ...
 npm run duild
 ...
 
-#Runs the app
+# Runs the app
 ...
 npm start
 npm dev
